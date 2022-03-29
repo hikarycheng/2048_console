@@ -6,7 +6,7 @@
 namespace GameLogics {
 	GameLogic::GameLogic(int size=4, int upperBound=2048)
 		:boardSize_(size), upperBound_(upperBound), maxNumPieces_(size* size) {
-		assert(size > 0); // "Board size should be greater than 0."
+		assert(size > 2); // "Board size should be greater than 0."
 		this->board_ = boardTy(boardSize_, std::vector<int>(boardSize_, 0));
 		std::random_device rd;
 		genEngine_ = std::ranlux48(rd());

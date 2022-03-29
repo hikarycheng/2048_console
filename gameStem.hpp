@@ -1,135 +1,124 @@
-#ifndef GAME_STEM_HPP
-#define GAME_STEM_HPP
+#ifndef GAME_HPP
+#define GAME_HPP
 
 #include "gameLogics.hpp"
 #include <iostream>
 #include <unordered_map>
 
-namespace GameStem {
+namespace Game {
+	enum class Operations { left = 'a', right = 'd', up = 'w', down = 's', restart = 'r', exit = 'e' };
 
-	enum class Operations {left='a', right='d', up='w', down='s', restart='r', exit='e' };
+	namespace {
+		static int currScore = 0, maxScore = 0;
+		static GameLogics::GameLogic logics;
+		static bool gameOvered = false;
+	}
 
-	class Game {
-	public:
-		Game(int boardSize = 4, int maxNum = 2048) 
-			:boardSize_(boardSize), maxNum_(maxNum), logics_(boardSize_, maxNum_) {
+	void newGame() {
+		logics.reset();
+		gameOvered = false;
+		currScore = 0;
+		logics.generateTile();
+		logics.generateTile();
+	}
 
-			currScore_ = 0;
-			maxScore_ = 0;
+	void oneStep(Operations operation) {
+		bool flag = false;
+		switch (operation)
+		{
+		case Operations::left:
+			flag = logics.move(GameLogics::Directions::left);
+			break;
+		case Operations::right:
+			flag = logics.move(GameLogics::Directions::right);
+			break;
+		case Operations::up:
+			flag = logics.move(GameLogics::Directions::up);
+			break;
+		case Operations::down:
+			flag = logics.move(GameLogics::Directions::down);
+			break;
 		}
 
-		void newGame() {
-			logics_.reset();
-			gameOvered_ = false;
-			currScore_ = 0;
-			logics_.generateTile();
+		if (flag) {
+			++currScore;
+			maxScore = std::max(currScore, maxScore);
 		}
 
-		void oneStep(Operations operation) {
-			bool flag = false;
-			switch (operation)
-			{
-			case Operations::left:
-				flag = logics_.move(GameLogics::Directions::left);
-				break;
-			case Operations::right:
-				flag = logics_.move(GameLogics::Directions::right);
-				break;
-			case Operations::up:
-				flag = logics_.move(GameLogics::Directions::up);
-				break;
-			case Operations::down:
-				flag = logics_.move(GameLogics::Directions::down);
-				break;
-			}
-
-			if (flag) {
-				++currScore_;
-				maxScore_ = std::max(currScore_, maxScore_);
-			}
-
-			if (logics_.isGameOver()) {
-				currScore_ = 0;
-				gameOvered_ = true;
-				return;
-			}
-			if (flag)
-				logics_.generateTile();
+		if (logics.isGameOver()) {
+			gameOvered = true;
+			return;
 		}
+		if (flag)
+			logics.generateTile();
+	}
 
-		void play() {
-			this->newGame();
-			this->display();
-			char operation;
+	void display() {
+		system("cls");
+		std::cout << "higest score is: " << maxScore
+			<< ", current score is: " << currScore << '\n';
+		std::cout << '\n';
+		std::cout << "Press A to move left, D to move right, W to move up, S to move down\n";
+		std::cout << "To restart a new game, please press R\n";
+		std::cout << "To exit the game, please press E\n";
+		std::cout << '\n';
+		std::cout << '\n';
+		std::cout << '\n';
 
-			while (true) {
-				while (gameOvered_) {
-					std::cout << "Game over, please press R to restart a new game\n";
-					std::cin >> operation;
-					if (operation == static_cast<char>(Operations::restart)) {
-						newGame();
-						this->display();
-						break;
-					}
+		auto const& board = logics.getBoard();
+
+		for (auto const& row : board) {
+			for (auto const& tile : row) {
+				if (tile == 0) {
+					std::cout << ".\t";
 				}
+				else {
+					std::cout << tile << '\t';
+				}
+			}
 
+			std::cout << '\n';
+		}
+
+		std::cout << '\n';
+		std::cout << "Move: ";
+
+	}
+
+	void game(int boardSize = 4, int maxNum = 2048) {
+		logics = GameLogics::GameLogic(boardSize, maxNum);
+		newGame();
+		display();
+		char operation;
+
+		while (true) {
+			while (gameOvered) {
+				std::cout << "Game over, please press R to restart a new game\n";
 				std::cin >> operation;
-				if (operation == static_cast<char>(Operations::exit)) {
+				if (operation == static_cast<char>(Operations::restart)) {
+					newGame();
+					display();
 					break;
 				}
-				if (operation == static_cast<char>(Operations::restart)) {
-					this->newGame();
-				}
-				else if (operation == static_cast<char>(Operations::down)
-						|| operation == static_cast<char>(Operations::right)
-						|| operation == static_cast<char>(Operations::left)
-						|| operation == static_cast<char>(Operations::up)) {
-
-					oneStep(static_cast<Operations>(operation));
-				}
-				this->display();
 			}
-		}
 
-		void display() const {
-			system("cls");
-			std::cout << "higest score is: " << maxScore_
-					<< ", current score is: "<< currScore_ << '\n';
-			std::cout << '\n';
-			std::cout << "Press A to move left, D to move right, W to move up, S to move down\n";
-			std::cout << "To restart a new game, please press R\n";
-			std::cout << "To exit the game, please press E\n";
-			std::cout << '\n';
-			std::cout << '\n';
-			std::cout << '\n';
-
-			auto const& board = logics_.getBoard();
-
-			for (auto const& row : board) {
-				for (auto const& tile : row) {
-					if (tile == 0) {
-						std::cout << ".\t";
-					}
-					else {
-						std::cout << tile << '\t';
-					}
-				}
-
-				std::cout << '\n';
+			std::cin >> operation;
+			if (operation == static_cast<char>(Operations::exit)) {
+				break;
 			}
-			//std::cout << "=========================================\n";
-			std::cout << '\n';
-			std::cout << "Move: ";
+			if (operation == static_cast<char>(Operations::restart)) {
+				newGame();
+			}
+			else if (operation == static_cast<char>(Operations::down)
+				|| operation == static_cast<char>(Operations::right)
+				|| operation == static_cast<char>(Operations::left)
+				|| operation == static_cast<char>(Operations::up)) {
 
+				oneStep(static_cast<Operations>(operation));
+			}
+			display();
 		}
-
-	private:
-		int boardSize_, maxNum_;
-		int maxScore_;
-		GameLogics::GameLogic logics_;
-		int currScore_;
-		bool gameOvered_ = false;
-	};
+	}
 }
 
-#endif // !GAME_STEM_HPP
+#endif // !GAME_HPP

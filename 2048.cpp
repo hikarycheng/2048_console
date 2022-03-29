@@ -1,19 +1,11 @@
 // 2048.cpp : This file contains the 'main' function. Program execution begins and ends there.
 //
 
-#include <iostream>
-#include <random>
 #include "gameStem.hpp"
-//#include "gameLogics.hpp"
+
 int main()
 {
-    //GameLogics::GameLogic game(4, 4096);
-    //game.generateTile();
-    //GameLogics::GameLogic g1;
-    //g1 = game;
-    //game.generateTile();
-    GameStem::Game game(4, 2048);
-    game.play();
+    Game::game(4, 2048);
     return 0;
 }
 
