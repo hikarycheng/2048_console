@@ -22,6 +22,11 @@ namespace Game {
 		logics.generateTile();
 	}
 
+	template<typename ty>
+	ty getMaxscore(ty curMaxScore, ty curScore) {
+		return std::max(curMaxScore, curScore);
+	}
+
 	void oneStep(Operations operation) {
 		bool flag = false;
 		switch (operation)
@@ -38,11 +43,14 @@ namespace Game {
 		case Operations::down:
 			flag = logics.move(GameLogics::Directions::down);
 			break;
+		case Operations::exit:
+		case Operations::restart:
+			break;
 		}
 
 		if (flag) {
 			++currScore;
-			maxScore = std::max(currScore, maxScore);
+			maxScore = getMaxscore(maxScore, currScore);
 		}
 
 		if (logics.isGameOver()) {
@@ -54,7 +62,7 @@ namespace Game {
 	}
 
 	void display() {
-		system("cls");
+		system("clear");
 		std::cout << "higest score is: " << maxScore
 			<< ", current score is: " << currScore << '\n';
 		std::cout << '\n';
@@ -107,6 +115,7 @@ namespace Game {
 				break;
 			}
 			if (operation == static_cast<char>(Operations::restart)) {
+				maxScore = getMaxscore(maxScore, currScore);
 				newGame();
 			}
 			else if (operation == static_cast<char>(Operations::down)

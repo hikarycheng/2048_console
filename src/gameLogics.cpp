@@ -4,7 +4,7 @@
 #include<utility>
 
 namespace GameLogics {
-	GameLogic::GameLogic(int size=4, int upperBound=2048)
+	GameLogic::GameLogic(int size, int upperBound)
 		:boardSize_(size), upperBound_(upperBound), maxNumPieces_(size* size) {
 		assert(size > 2); // "Board size should be greater than 0."
 		this->board_ = boardTy(boardSize_, std::vector<int>(boardSize_, 0));
@@ -13,7 +13,7 @@ namespace GameLogics {
 		distrib_ = std::uniform_int_distribution<> (0, maxNumPieces_-1);
 	};
 
-	GameLogic::GameLogic() :GameLogic(4, 2048) {};
+	// GameLogic::GameLogic() :GameLogic(4, 2048) {};
 
 	GameLogic& GameLogic::operator=(GameLogic const& other) noexcept {
 		if (this == &other) {

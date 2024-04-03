@@ -14,8 +14,8 @@ namespace GameLogics {
 
 	class GameLogic {
 	public:
-		GameLogic(int, int);
-		GameLogic();
+		GameLogic(int=4, int=2048);
+		// GameLogic();
 		bool move(const Directions);
 		bool generateTile() noexcept;
 		bool isGameOver() const noexcept;
